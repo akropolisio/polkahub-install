@@ -2,3 +2,88 @@
 # Copyright 2019 Akropolis
 
 # install polkahub cli
+VERSION="0.2.1"
+URL="https://github.com/akropolisio/polkahub-cli/releases/download/$(VERSION)/polkahub"
+KEY_URL="https://github.com/akropolisio/polkahub-cli/releases/download/$(VERSION)/sum.txt"
+
+check_os() {
+    if [ "$(uname)" = "Linux" ] ; then
+     PKG="linux"   # linux is my default
+
+     elif [ "$(uname)" = "Darwin" ] ; then
+         PKG="darwin"
+         echo "Running on Apple"
+     else
+         echo "Unknown operating system"
+         echo "Please select your operating system"
+         echo "Choices:"
+         echo "       linux - any linux distro"
+        echo "       darwin - MacOS"
+         read PKG
+     fi
+ }
+
+check_sha256() {
+  # how to check for sha256?
+  SHA256_CHECK=$(which sha256sum 2> /dev/null)
+  if [[ -z $SHA256_CHECK ]] ; then
+    # no sha256sum? try with rhash ...
+    SHA256_CHECK=$(which rhash 2> /dev/null)
+    SHA256_CHECK="$SHA256_CHECK --sha256"
+  fi
+
+  if [ "$PKG" = "darwin" ] ; then
+    SHA256_CHECK="shasum -a 256"
+  fi
+
+  # see if we can call the binary to calculate sha256 sums
+  if ! ($SHA256_CHECK --version &> /dev/null) then
+    echo "Unable to check SHA256 checksum, please install sha256sum or rhash binary"
+    cleanup
+    exit 1
+  fi
+
+  # $SHA256_CHECK $TMPDIR/$DOWNLOAD_FILE 
+  IS_CHECKSUM=$($SHA256_CHECK $TMPDIR/polkahub | awk '{print $1}')
+  MUST_CHECKSUM=$(curl -sS $KEY_URL)
+  # debug # echo -e "is checksum:\t $IS_CHECKSUM"
+  # debug # echo -e "must checksum:\t $MUST_CHECKSUM"
+  if [[ $IS_CHECKSUM != $MUST_CHECKSUM ]]; then
+    echo "SHA256 Checksum missmatch, aborting installation"
+    cleanup
+    exit 1 
+  fi
+}
+
+install() {
+   TMPDIR=$(mktemp -d) && cd $TMPDIR
+     curl -Ss -O $URL
+   check_sha256
+
+     if [ "$PKG" = "linux" ] ; then
+       sudo cp $TMPDIR/polkahub /usr/bin && sudo chmod +x /usr/bin/polkahub
+     fi
+
+     if [ "$PKG" = "darwin" ] ; then
+       sudo cp $TMPDIR/polkahub /usr/local/bin && sudo chmod +x /usr/local/bin/polkahub
+     fi
+ }
+
+cleanup() {
+  rm $TMPDIR/*
+  rmdir $TMPDIR
+}
+
+## RUN  ##
+
+## curl installed?
+which curl &> /dev/null
+if [[ $? -ne 0 ]] ; then
+    echo '"curl" binary not found, please install and retry'
+    exit 1
+fi
+##
+
+check_os
+install
+cleanup
