@@ -45,7 +45,7 @@ check_sha256() {
 
   # $SHA256_CHECK $TMPDIR/$DOWNLOAD_FILE 
   IS_CHECKSUM=$($SHA256_CHECK $TMPDIR/polkahub | awk '{print $1}')
-  MUST_CHECKSUM=$(curl -sS $KEY_URL)
+  MUST_CHECKSUM=$(curl -L $KEY_URL)
    echo $IS_CHECKSUM =? $MUST_CHECKSUM 
   # debug # echo -e "is checksum:\t $IS_CHECKSUM"
   # debug # echo -e "must checksum:\t $MUST_CHECKSUM"
