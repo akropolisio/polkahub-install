@@ -57,7 +57,7 @@ check_sha256() {
 
 install() {
    TMPDIR=$(mktemp -d) && cd $TMPDIR
-     curl -Ss -O $URL -o polkahub
+     curl -LO $URL
    check_sha256
 
      if [ "$PKG" = "linux" ] ; then
