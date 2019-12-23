@@ -45,9 +45,9 @@ check_sha256() {
 
   # $SHA256_CHECK $DOWNLOAD_FILE 
   IS_CHECKSUM=$($SHA256_CHECK polkahub | awk '{print $1}')
-  MUST_CHECKSUM=$(curl -L $KEY_URL)
-  echo -e "is checksum:\t $IS_CHECKSUM"
-  echo -e "must checksum:\t $MUST_CHECKSUM"
+  MUST_CHECKSUM=$(curl -SsL $KEY_URL)
+  # debug # echo -e "is checksum:\t $IS_CHECKSUM"
+  # debug # echo -e "must checksum:\t $MUST_CHECKSUM"
   if [[ $IS_CHECKSUM != $MUST_CHECKSUM ]]; then
     echo "SHA256 Checksum missmatch, aborting installation"
     cleanup
@@ -57,16 +57,17 @@ check_sha256() {
 
 install() {
    TMPDIR=$(mktemp -d) && cd $TMPDIR
-     curl -LO $URL
+     curl -SsLO $URL
    check_sha256
+   echo "Polkahub cli successfully downloaded and checksum verified!"
+   echo "Installing to the terminal..."
+    if [ "$PKG" = "linux" ] ; then
+      sudo cp $TMPDIR/polkahub /usr/bin && sudo chmod +x /usr/bin/polkahub
+    fi
 
-     if [ "$PKG" = "linux" ] ; then
-       sudo cp $TMPDIR/polkahub /usr/bin && sudo chmod +x /usr/bin/polkahub
-     fi
-
-     if [ "$PKG" = "darwin" ] ; then
-       sudo cp $TMPDIR/polkahub /usr/local/bin && sudo chmod +x /usr/local/bin/polkahub
-     fi
+    if [ "$PKG" = "darwin" ] ; then
+      sudo cp $TMPDIR/polkahub /usr/local/bin && sudo chmod +x /usr/local/bin/polkahub
+    fi
  }
 
 cleanup() {
