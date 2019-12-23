@@ -43,13 +43,11 @@ check_sha256() {
     exit 1
   fi
 
-  # $SHA256_CHECK $TMPDIR/$DOWNLOAD_FILE 
-  IS_CHECKSUM=$($SHA256_CHECK $TMPDIR/polkahub | awk '{print $1}')
+  # $SHA256_CHECK $DOWNLOAD_FILE 
+  IS_CHECKSUM=$($SHA256_CHECK polkahub | awk '{print $1}')
   MUST_CHECKSUM=$(curl -L $KEY_URL)
-  echo $IS_CHECKSUM 
-  echo $IS_CHECKSUM =? $MUST_CHECKSUM 
-  # debug # echo -e "is checksum:\t $IS_CHECKSUM"
-  # debug # echo -e "must checksum:\t $MUST_CHECKSUM"
+  echo -e "is checksum:\t $IS_CHECKSUM"
+  echo -e "must checksum:\t $MUST_CHECKSUM"
   if [[ $IS_CHECKSUM != $MUST_CHECKSUM ]]; then
     echo "SHA256 Checksum missmatch, aborting installation"
     cleanup
