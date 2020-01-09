@@ -4,7 +4,7 @@
 # install polkahub cli
 VERSION="v0.2.6"
 URL="https://github.com/akropolisio/polkahub-cli/releases/download/$VERSION/"
-KEY_URL="https://github.com/akropolisio/polkahub-cli/releases/download/$VERSION/cs.txt"
+KEY_URL="https://github.com/akropolisio/polkahub-cli/releases/download/$VERSION/"
 
 check_os() {
     if [ "$(uname)" = "Linux" ] ; then
@@ -45,7 +45,12 @@ check_sha256() {
 
   # $SHA256_CHECK $DOWNLOAD_FILE 
   IS_CHECKSUM=$($SHA256_CHECK polkahub | awk '{print $1}')
-  MUST_CHECKSUM=$(curl -SsL $KEY_URL)
+~ if [ "$PKG" = "linux" ] ; then
+    MUST_CHECKSUM=$(curl -SsL $KEY_URL/cs.txt) 
+  fi  
+  if [ "$PKG" = "darwin" ] ; then
+    MUST_CHECKSUM=$(curl -SsL $KEY_URL/cs_osx.sh)
+  fi 
   # debug # echo -e "is checksum:\t $IS_CHECKSUM"
   # debug # echo -e "must checksum:\t $MUST_CHECKSUM"
   if [[ $IS_CHECKSUM != $MUST_CHECKSUM ]]; then
@@ -57,7 +62,7 @@ check_sha256() {
 
 install() {
    TMPDIR=$(mktemp -d) && cd $TMPDIR
-       if [ "$PKG" = "linux" ] ; then
+      if [ "$PKG" = "linux" ] ; then
         curl -SsLO $URL/polkahub
       fi
 
