@@ -51,8 +51,8 @@ check_sha256() {
   if [ "$PKG" = "darwin" ] ; then
     MUST_CHECKSUM=$(curl -SsL $KEY_URL/cs_osx.txt)
   fi 
-  # debug # echo -e "is checksum:\t $IS_CHECKSUM"
-  # debug # echo -e "must checksum:\t $MUST_CHECKSUM"
+  echo -e "is checksum:\t $IS_CHECKSUM"
+  echo -e "must checksum:\t $MUST_CHECKSUM"
   if [[ $IS_CHECKSUM != $MUST_CHECKSUM ]]; then
     echo "SHA256 Checksum missmatch, aborting installation"
     cleanup
