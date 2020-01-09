@@ -45,7 +45,7 @@ check_sha256() {
 
   # $SHA256_CHECK $DOWNLOAD_FILE 
   IS_CHECKSUM=$($SHA256_CHECK polkahub | awk '{print $1}')
-~ if [ "$PKG" = "linux" ] ; then
+  if [ "$PKG" = "linux" ] ; then
     MUST_CHECKSUM=$(curl -SsL $KEY_URL/cs.txt) 
   fi  
   if [ "$PKG" = "darwin" ] ; then
